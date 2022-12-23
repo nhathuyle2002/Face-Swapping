@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 import dlib
 import time
-
+import random
+import os
 
 def extract_index_nparray(nparray):
     index = None
@@ -11,14 +12,20 @@ def extract_index_nparray(nparray):
         break
     return index
 
-def swapFace(path_src, path_dst):
+def swapFace(path_src, path_dst, path_output='result.jpg'):
+    WIDTH = 1024
+    HEIGHT = 1024
+    
     img = cv2.imread(path_src)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     mask = np.zeros_like(img_gray)
+    
+    start_time = time.time()
+    
     img2 = cv2.imread(path_dst)
     img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-
-
+    
+    
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     height, width, channels = img2.shape
@@ -33,8 +40,7 @@ def swapFace(path_src, path_dst):
         for n in range(0, 68):
             x = landmarks.part(n).x
             y = landmarks.part(n).y
-            landmarks_points.append((x, y))
-
+            landmarks_points.append((min(x, WIDTH-1), min(y, HEIGHT-1)))
 
 
         points = np.array(landmarks_points, np.int32)
@@ -72,7 +78,6 @@ def swapFace(path_src, path_dst):
                 indexes_triangles.append(triangle)
 
 
-
     # Face 2
     faces2 = detector(img2_gray)
     for face in faces2:
@@ -81,8 +86,7 @@ def swapFace(path_src, path_dst):
         for n in range(0, 68):
             x = landmarks.part(n).x
             y = landmarks.part(n).y
-            landmarks_points2.append((x, y))
-
+            landmarks_points2.append((min(x, WIDTH-1), min(y, HEIGHT-1)))
 
         points2 = np.array(landmarks_points2, np.int32)
         convexhull2 = cv2.convexHull(points2)
@@ -143,14 +147,23 @@ def swapFace(path_src, path_dst):
 
         # Reconstructing destination face
         img2_new_face_rect_area = img2_new_face[y: y + h, x: x + w]
+        
+        # h2, w2 = img2_new_face_rect_area.shape[0:2]
+        # if img2_new_face_rect_area.shape != (h, w, 3):
+        #     img2_new_face_rect_area = cv2.resize(img2_new_face_rect_area, (w, h), interpolation = cv2.INTER_AREA)
+            
         img2_new_face_rect_area_gray = cv2.cvtColor(img2_new_face_rect_area, cv2.COLOR_BGR2GRAY)
         _, mask_triangles_designed = cv2.threshold(img2_new_face_rect_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
+        
+        # print(h, w)
+        # print(warped_triangle.shape, mask_triangles_designed.shape, img2_new_face_rect_area.shape)
+        
         warped_triangle = cv2.bitwise_and(warped_triangle, warped_triangle, mask=mask_triangles_designed)
-
+        
         img2_new_face_rect_area = cv2.add(img2_new_face_rect_area, warped_triangle)
+        # if img2_new_face_rect_area.shape != (h2, w2, 3):
+        #     img2_new_face_rect_area = cv2.resize(img2_new_face_rect_area, (w2, h2), interpolation = cv2.INTER_AREA)
         img2_new_face[y: y + h, x: x + w] = img2_new_face_rect_area
-
-
 
     # Face swapped (putting 1st face into 2nd face)
     img2_face_mask = np.zeros_like(img2_gray)
@@ -162,24 +175,39 @@ def swapFace(path_src, path_dst):
     result = cv2.add(img2_head_noface, img2_new_face)
 
     (x, y, w, h) = cv2.boundingRect(convexhull2)
+
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
 
-    cv2.imshow("img", img)
-    cv2.imshow("img2", img2)
-    cv2.imshow("seamlessclone", seamlessclone)
-    cv2.imwrite("result.jpg", seamlessclone)
-    cv2.waitKey(0)
+    # cv2.imshow("seamlessclone", seamlessclone)
+    cv2.imwrite(path_output, seamlessclone)
+    # cv2.waitKey(0)
 
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
-    path_src = "D:/Dataset/00000/00016.png"
-    path_dst = "D:/Dataset/00000/00098.png"
-    try:
-        swapFace(path_src, path_dst)
-    # except AssertionError:
-    #     print("Cannot swap!")
-    finally:
-        print("Done!")
+    dir_data = "D:/Dataset/00000"
+    dir_output_folder = "D:/outputImage/evaluation"
+    path_list = os.listdir(dir_data)
+    #random.seed(20520056)
+    N_TIMES = 100
+    time_list = []
+    for t in range(N_TIMES):
+        name_src = random.choice(path_list)
+        name_dst = random.choice(path_list)
+        path_src = os.path.join(dir_data, name_src)
+        path_dst = os.path.join(dir_data, name_dst)
+        path_output = os.path.join(dir_output_folder, name_src.split('.')[0] + '_' + name_dst.split('.')[0] + '.jpg')
+        print(path_src, path_dst, path_output)
+        start_time = time.time()
+        try:
+            swapFace(path_src, path_dst, path_output)
+        # except:
+        #     print("Cannot swap!")
+        finally:
+            time_list.append(time.time() - start_time)
+
+    print(np.mean(time_list))
+    np.save("time_list.npy", time_list)
