@@ -12,6 +12,23 @@ def extract_index_nparray(nparray):
         break
     return index
 
+def check_point_in_convexhull(p0, convexhull):
+    n = len(convexhull)
+    area1 = 0
+    area2 = 0
+    for id in range(n):
+        p1 = convexhull[id][0]
+        p2 = convexhull[(id+1) % n][0]
+        # print(p1, p2)
+        area1 += (p0[0]-p1[0]) * (p0[1]+p1[1]) + (p1[0]-p2[0]) * (p1[1]+p2[1]) + (p2[0]-p0[0]) * (p2[1]+p0[1])
+        area2 += (p1[0]-p2[0]) * (p1[1]+p2[1])
+        
+    # print(area1, area2)
+    if area2 == area1:
+        return True
+    else:
+        return False
+
 def swapFace(path_src, path_dst):
     img = cv2.imread(path_src)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -197,17 +214,23 @@ def swapFace(path_src, path_dst):
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.MIXED_CLONE)
+    
+    for w in range(height1):
+        for h in range(width1):
+            for d in range(3):
+                seamlessclone[w, h, d] = int((seamlessclone[w, h, d]*2 + img2[w, h, d])/3)
 
     # cv2.imshow("img", img)
-    # cv2.imshow("img2", img2)
+    cv2.imshow("img2", img2)
     cv2.imshow("seamlessclone", seamlessclone)
     cv2.imwrite("result.jpg", seamlessclone)
     cv2.waitKey(0)
 
     cv2.destroyAllWindows()
 
+
 if __name__ == "__main__":
-    path_src = "D:/Dataset/00000/00606.png"
+    path_src = "kj.png" #D:/Dataset/00000/00606.png"
     cv2.imwrite('src_image.png', cv2.imread(path_src))
     path_alignment = 'alignment_image.png'
     path_dst = "D:/Dataset/00000/00300.png"
@@ -219,3 +242,7 @@ if __name__ == "__main__":
     #     print("Cannot swap!")
     finally:
         print("Done!")
+
+# convexhull = np.array([[[0, 0]], [[10, 0]], [[10, 10]], [[0, 10]]])
+# print(convexhull.shape)
+# print(check_point_in_convexhull([5, 5], convexhull))

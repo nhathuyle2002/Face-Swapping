@@ -168,6 +168,11 @@ def swapFace(path_src, path_dst):
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.MIXED_CLONE)
+    height1, width1 = img2.shape[0:2]
+    for w in range(height1):
+        for h in range(width1):
+            for d in range(3):
+                seamlessclone[w, h, d] = int((seamlessclone[w, h, d]*2 + img2[w, h, d])/3)
 
     # cv2.imshow("img", img)
     # cv2.imshow("img2", img2)
