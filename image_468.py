@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 import dlib
 import time
-import random
-import os
+import mediapipe as mp
 from alignment import face_alignment
 
 def extract_index_nparray(nparray):
@@ -13,7 +12,7 @@ def extract_index_nparray(nparray):
         break
     return index
 
-def swapFace(path_src, path_dst, path_output):
+def swapFace(path_src, path_dst):
     img = cv2.imread(path_src)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     mask = np.zeros_like(img_gray)
@@ -199,34 +198,24 @@ def swapFace(path_src, path_dst, path_output):
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.MIXED_CLONE)
 
-    # cv2.imshow("seamlessclone", seamlessclone)
-    cv2.imwrite(path_output, seamlessclone)
-    # cv2.waitKey(0)
+    # cv2.imshow("img", img)
+    # cv2.imshow("img2", img2)
+    cv2.imshow("seamlessclone", seamlessclone)
+    cv2.imwrite("result.jpg", seamlessclone)
+    cv2.waitKey(0)
 
-    # cv2.destroyAllWindows()
-
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    dir_data = "D:/Dataset/00000"
-    dir_output_folder = "D:/outputImage/evaluation"
-    path_list = os.listdir(dir_data)
-    #random.seed(20520056)
-    N_TIMES = 100
-    time_list = []
-    for t in range(N_TIMES):
-        name_src = random.choice(path_list)
-        name_dst = random.choice(path_list)
-        path_src = os.path.join(dir_data, name_src)
-        path_dst = os.path.join(dir_data, name_dst)
-        path_output = os.path.join(dir_output_folder, name_src.split('.')[0] + '_' + name_dst.split('.')[0] + '.jpg')
-        print(path_src, path_dst, path_output)
-        start_time = time.time()
-        try:
-            swapFace(path_src, path_dst, path_output)
-        # except:
-        #     print("Cannot swap!")
-        finally:
-            time_list.append(time.time() - start_time)
-
-    print(np.mean(time_list))
-    np.save("time_list.npy", time_list)
+    path_src = "D:/Dataset/00000/00606.png"
+    cv2.imwrite('src_image.png', cv2.imread(path_src))
+    path_alignment = 'alignment_image.png'
+    path_dst = "D:/Dataset/00000/00300.png"
+    cv2.imwrite('dst_image.png', cv2.imread(path_dst))
+    try:
+        face_alignment(path_src, path_alignment)
+        swapFace(path_alignment, path_dst)
+    # except AssertionError:
+    #     print("Cannot swap!")
+    finally:
+        print("Done!")

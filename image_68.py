@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import dlib
 import time
-from face_alignment import face_alignment
+from alignment import face_alignment
 
 
 def extract_index_nparray(nparray):
@@ -73,7 +73,7 @@ def swapFace(path_src, path_dst):
                 triangle = [index_pt1, index_pt2, index_pt3]
                 indexes_triangles.append(triangle)
 
-
+    id_mouth_inner = [x for x in range(60, 68)]
 
     # Face 2
     faces2 = detector(img2_gray)
@@ -93,7 +93,8 @@ def swapFace(path_src, path_dst):
     lines_space_new_face = np.zeros_like(img2)
     # Triangulation of both faces
     for triangle_index in indexes_triangles:
-        # Triangulation of the first face
+        # Triangulation of the first face    
+        
         tr1_pt1 = landmarks_points[triangle_index[0]]
         tr1_pt2 = landmarks_points[triangle_index[1]]
         tr1_pt3 = landmarks_points[triangle_index[2]]
@@ -177,7 +178,7 @@ def swapFace(path_src, path_dst):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    path_src = "kj.png" #"D:/Dataset/00000/00606.png"
+    path_src = "D:/Dataset/00000/00606.png"
     cv2.imwrite('src_image.png', cv2.imread(path_src))
     path_alignment = 'alignment_image.png'
     path_dst = "D:/Dataset/00000/00300.png"

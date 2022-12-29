@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import dlib
 import time
+from alignment import face_alignment
 
 
 def extract_index_nparray(nparray):
@@ -178,5 +179,13 @@ def swapFaceRealtime(path_src):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    path_src = "alignment_image.png"
-    swapFaceRealtime(path_src)
+    path_src = "D:/Dataset/00000/00606.png"
+    cv2.imwrite('src_image.png', cv2.imread(path_src))
+    path_alignment = 'alignment_image.png'
+    try:
+        face_alignment(path_src, path_alignment)
+        swapFaceRealtime(path_alignment)
+    # except AssertionError:
+    #     print("Cannot swap!")
+    finally:
+        print("Done!")
