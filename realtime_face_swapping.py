@@ -178,5 +178,5 @@ def swapFaceRealtime(path_src):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    path_src = "anh1.jpg"
+    path_src = "alignment_image.png"
     swapFaceRealtime(path_src)
