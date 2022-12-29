@@ -165,7 +165,7 @@ def swapFaceRealtime(path_src):
 
             seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
     
-            seamlessclone = np.array(seamlessclone*(2/3)+img2*(1/3), dtype=np.uint8)
+            seamlessclone = np.array(seamlessclone*(1/2)+img2*(1/2), dtype=np.uint8)
 
             cv2.imshow("warpingResult", result)
             cv2.imshow("seamlessClone", seamlessclone)
@@ -181,7 +181,7 @@ def swapFaceRealtime(path_src):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    path_src = "D:/Dataset/00000/00606.png"
+    path_src = "kj.png" #"D:/Dataset/00000/00606.png"
     cv2.imwrite('src_image.png', cv2.imread(path_src))
     path_alignment = 'alignment_image.png'
     try:

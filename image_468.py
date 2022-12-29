@@ -215,7 +215,7 @@ def swapFace(path_src, path_dst):
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
     
-    seamlessclone = np.array(seamlessclone*(2/3)+img2*(1/3), dtype=np.uint8)
+    seamlessclone = np.array(seamlessclone*(1/2)+img2*(1/2), dtype=np.uint8)
 
     # cv2.imshow("img", img)
     # cv2.imshow("img2", img2)

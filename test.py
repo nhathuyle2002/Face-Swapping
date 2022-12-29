@@ -169,10 +169,10 @@ def swapFace_68(path_src, path_dst, path_output):
 
     seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
     
-    seamlessclone = np.array(seamlessclone*(2/3)+img2*(1/3), dtype=np.uint8)
+    seamlessclone = np.array(seamlessclone*(1/2)+img2*(1/2), dtype=np.uint8)
 
     # cv2.imshow("seamlessclone", seamlessclone)
-    # cv2.imwrite(path_output, seamlessclone)
+    cv2.imwrite(path_output, seamlessclone)
     # cv2.waitKey(0)
 
     # cv2.destroyAllWindows()
@@ -326,7 +326,7 @@ def swapFace_468(path_src, path_dst, path_output):
         cropped_tr2_mask = np.zeros((h, w), np.uint8)
 
         points2 = np.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
-                            [tr2_pt2[0] - x, tr2_pt2[1] - y],
+                            [tr2_pt2[0] - x, tr2_pt2[1] - y],NORMAL_CLONE
                             [tr2_pt3[0] - x, tr2_pt3[1] - y]], np.int32)
 
         cv2.fillConvexPoly(cropped_tr2_mask, points2, 255)
@@ -361,10 +361,12 @@ def swapFace_468(path_src, path_dst, path_output):
     x, y, w, h = cv2.boundingRect(convexhull2)
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
-    seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.MIXED_CLONE)
+    seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
+    
+    seamlessclone = np.array(seamlessclone*(1/2)+img2*(1/2), dtype=np.uint8)
 
     # cv2.imshow("seamlessclone", seamlessclone)
-    # cv2.imwrite(path_output, seamlessclone)
+    cv2.imwrite(path_output, seamlessclone)
     # cv2.waitKey(0)
 
     # cv2.destroyAllWindows()
@@ -374,8 +376,8 @@ if __name__ == "__main__":
     dir_data = "D:/Dataset/00000"
     dir_output_folder = "D:/outputImage/evaluation"
     path_list = os.listdir(dir_data)
-    #random.seed(20520056)
-    N_TIMES = 10
+    #random.seed(1)
+    N_TIMES = 100
     time_list = []
     for t in range(N_TIMES):
         name_src = random.choice(path_list)
