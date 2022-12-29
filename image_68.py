@@ -73,8 +73,6 @@ def swapFace(path_src, path_dst):
                 triangle = [index_pt1, index_pt2, index_pt3]
                 indexes_triangles.append(triangle)
 
-    id_mouth_inner = [x for x in range(60, 68)]
-
     # Face 2
     faces2 = detector(img2_gray)
     for face in faces2:
@@ -167,12 +165,9 @@ def swapFace(path_src, path_dst):
     (x, y, w, h) = cv2.boundingRect(convexhull2)
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
-    seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.MIXED_CLONE)
-    height1, width1 = img2.shape[0:2]
-    for w in range(height1):
-        for h in range(width1):
-            for d in range(3):
-                seamlessclone[w, h, d] = int((seamlessclone[w, h, d]*2 + img2[w, h, d])/3)
+    seamlessclone = cv2.seamlessClone(result, img2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
+    
+    seamlessclone = np.array(seamlessclone*(2/3)+img2*(1/3), dtype=np.uint8)
 
     # cv2.imshow("img", img)
     # cv2.imshow("img2", img2)
@@ -183,10 +178,10 @@ def swapFace(path_src, path_dst):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    path_src = "D:/Dataset/00000/00606.png"
+    path_src = "anh1.jpg" #D:/Dataset/00000/00606.png"
     cv2.imwrite('src_image.png', cv2.imread(path_src))
     path_alignment = 'alignment_image.png'
-    path_dst = "D:/Dataset/00000/00300.png"
+    path_dst = "anhHung.jpg" #"D:/Dataset/00000/00300.png"
     cv2.imwrite('dst_image.png', cv2.imread(path_dst))
     try:
         face_alignment(path_src, path_alignment)
