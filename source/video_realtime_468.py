@@ -220,7 +220,7 @@ def swapFaceRealtime(path_src):
     cv2.destroyAllWindows()
     
 if __name__ == "__main__":
-    path_src = "kj.png" #"D:/Dataset/00000/00606.png"
+    path_src =  "test2.jpg" #"D:/Dataset/00000/00082.png" #"anhHung.jpg"
     cv2.imwrite('src_image.png', cv2.imread(path_src))
     path_alignment = 'alignment_image.png'
     try:
